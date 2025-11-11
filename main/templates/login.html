@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio de Sesión</title>
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="form-box">
+      <h1>Inicia sesión</h1>
+      <form>
+        <input type="email" placeholder="Correo" required>
+        <input type="password" placeholder="Contraseña" required>
+        <button type="submit">Iniciar sesión</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

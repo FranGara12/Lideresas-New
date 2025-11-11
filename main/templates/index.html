@@ -2,71 +2,151 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lideresas</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIDERESAS - Organización de Documentos</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
+    <nav class="navbar">
+        <div class="logo">🌸</div>
+        <div class="nav-links">
+            <a href="{% url 'login' %}">Iniciar sesión</a>
+            <a href="{% url 'register' %}">Regístrate</a>
 
-  <!-- Navbar -->
-  <header class="navbar">
-    <div class="logo">
-      <i class="fas fa-circle"></i> LIDERESAS
-    </div>
-    <nav>
-      <a href="#" class="btn-outline">Iniciar sesión</a>
-      <a href="#" class="btn-primary">Registrarse</a>
+        </div>
     </nav>
-  </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <h1>LIDERESAS</h1>
-    <p>Organizamos y guardamos lo que es importante para tu pyme</p>
-    <img src="https://cdn-icons-png.flaticon.com/512/7070/7070315.png" alt="carpeta" class="hero-img">
-  </section>
+     <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">LIDERESAS</h1>
+            <p class="hero-subtitle">Organizamos y garantizamos que es importante para tu pyme</p>
+            
+            <div class="folders-illustration">
+                <div class="folder folder-purple folder-back"></div>
+                <div class="folder folder-blue folder-middle"></div>
+                <div class="folder folder-cyan folder-front"></div>
+            </div>
+        </div>
+    </section>
 
-  <!-- Features -->
-  <section class="features">
-    <div class="feature">
-      <i class="fas fa-folder-open"></i>
-      <h3>Orden</h3>
-      <p>Mantén organizados todos tus documentos</p>
-    </div>
-    <div class="feature">
-      <i class="fas fa-table"></i>
-      <h3>Flexibilidad</h3>
-      <p>Agilizamos varios formatos de documentos</p>
-    </div>
-    <div class="feature">
-      <i class="fas fa-shield-alt"></i>
-      <h3>Seguridad</h3>
-      <p>Tus documentos estarán seguros con nosotros</p>
-    </div>
-  </section>
+    
+    <section class="services">
+        <div class="container">
+            <div class="services-header">
+                <h2 class="section-title">Te ofrecemos</h2>
+                <p class="section-subtitle">Soluciones digitales diseñadas para hacer crecer tu negocio</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon-wrapper">
+                        <div class="service-icon">📁</div>
+                    </div>
+                    <h3>Orden</h3>
+                    <p>Organiza todos tus documentos de forma intuitiva y eficiente. Categoriza facturas, contratos y archivos importantes en un solo lugar.</p>
+                    <ul class="service-features">
+                        <li>✓ Categorización automática</li>
+                        <li>✓ Búsqueda rápida</li>
+                        <li>✓ Estructura personalizable</li>
+                    </ul>
+                </div>
 
-  <!-- About -->
-  <section class="about">
-    <div class="about-content">
-      <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=400&q=80" alt="mujeres trabajando">
-      <div class="text">
-        <h2>¿Qué es Lideresas?</h2>
-        <p>
-          Pyme digital que organiza y optimiza equipos emprendedores <br>
-          y ayuda en todo lo que sea gestionar sus trámites y documentos.
-        </p>
-        <a href="#" class="btn-light">Conócenos ahora</a>
-      </div>
-    </div>
-  </section>
+                <div class="service-card service-card-featured">
+                    <div class="featured-badge">Popular</div>
+                    <div class="service-icon-wrapper">
+                        <div class="service-icon">📄</div>
+                    </div>
+                    <h3>Usabilidad</h3>
+                    <p>Accede a tus documentos desde cualquier dispositivo, en cualquier momento. Una plataforma pensada para facilitarte el trabajo diario.</p>
+                    <ul class="service-features">
+                        <li>✓ Acceso multiplataforma</li>
+                        <li>✓ Interfaz intuitiva</li>
+                        <li>✓ Sin curva de aprendizaje</li>
+                    </ul>
+                </div>
 
-  <!-- Footer -->
-  <footer>
-    <p>© 2025 LIDERESAS. Organización tu pyme con orden, flexibilidad y seguridad.</p>
-  </footer>
+                <div class="service-card">
+                    <div class="service-icon-wrapper">
+                        <div class="service-icon">🔒</div>
+                    </div>
+                    <h3>Seguridad</h3>
+                    <p>Protegemos tu información con los más altos estándares de seguridad. Respaldos automáticos y encriptación de datos.</p>
+                    <ul class="service-features">
+                        <li>✓ Encriptación end-to-end</li>
+                        <li>✓ Respaldo en la nube</li>
+                        <li>✓ Recuperación de datos</li>
+                    </ul>
+                </div>
+            </div>
 
+            <div class="cta-section">
+                <h3>¿Lista para transformar tu negocio?</h3>
+                <p>Únete a cientos de emprendedoras que ya confían en nosotras</p>
+                <button class="cta-button">Comenzar ahora</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="target-audience">
+        <div class="container">
+            <div class="audience-content">
+                <div class="audience-left">
+                    <div class="audience-icon">
+                        <div class="person person-1"></div>
+                        <div class="person person-2"></div>
+                        <div class="person person-3"></div>
+                    </div>
+                    <div class="audience-stats">
+                        <div class="stat">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Emprendedoras</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">1000+</div>
+                            <div class="stat-label">Documentos seguros</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="audience-text">
+                    <h2>¿A quién va dirigido?</h2>
+                    <p class="audience-intro">Creado especialmente para mujeres emprendedoras que buscan profesionalizar su negocio</p>
+                    
+                    <div class="audience-list">
+                        <div class="audience-item">
+                            <span class="audience-emoji">👩‍💼</span>
+                            <div>
+                                <h4>Pymes lideradas por mujeres</h4>
+                                <p>Si diriges una pequeña o mediana empresa y necesitas orden administrativo</p>
+                            </div>
+                        </div>
+                        
+                        <div class="audience-item">
+                            <span class="audience-emoji">🚀</span>
+                            <div>
+                                <h4>Emprendedoras iniciando</h4>
+                                <p>Estás dando tus primeros pasos y quieres empezar con el pie derecho</p>
+                            </div>
+                        </div>
+                        
+                        <div class="audience-item">
+                            <span class="audience-emoji">💪</span>
+                            <div>
+                                <h4>Mujeres buscando apoyo</h4>
+                                <p>Necesitas herramientas y una comunidad que te impulse a crecer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 LIDERESAS. Todos los derechos reservados.</p>
+        </div>
+    </footer>
 </body>
 </html>

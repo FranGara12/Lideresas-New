@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: linear-gradient(135deg, #7b4fff, #5e5e5e);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+/* Caja principal */
+.form-box {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+}
+
+/* Título grande alineado a la izquierda */
+h1 {
+  font-size: 2.5rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+
+/* Formulario */
+form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+}
+
+input {
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  outline: none;
+  font-size: 1rem;
+}
+
+button {
+  background-color: white;
+  color: #5e5e5e;
+  border: none;
+  border-radius: 20px;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #f2f2f2;
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  form {
+    width: 250px;
+  }
+}
