@@ -9,7 +9,10 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">🌸</div>
+        <div class="logo">
+        <img src="{% static 'img/logo.png' %}" alt="Descripción de la imagen" width="50" height="50">
+        </div>
+
         <div class="nav-links">
             <a href="{% url 'login' %}">Iniciar sesión</a>
             <a href="{% url 'register' %}">Regístrate</a>
@@ -20,7 +23,7 @@
      <section class="hero">
         <div class="container">
             <h1 class="hero-title">LIDERESAS</h1>
-            <p class="hero-subtitle">Organizamos y garantizamos que es importante para tu pyme</p>
+            <p class="hero-subtitle">Organizamos y garantizamos lo que es importante para tu pyme</p>
             
             <div class="folders-illustration">
                 <div class="folder folder-purple folder-back"></div>
@@ -52,7 +55,7 @@
                     </ul>
                 </div>
 
-                <div class="service-card service-card-featured">
+                <div class="service-card">
                     <div class="featured-badge">Popular</div>
                     <div class="service-icon-wrapper">
                         <div class="service-icon">📄</div>
@@ -83,7 +86,7 @@
             <div class="cta-section">
                 <h3>¿Lista para transformar tu negocio?</h3>
                 <p>Únete a cientos de emprendedoras que ya confían en nosotras</p>
-                <button class="cta-button">Comenzar ahora</button>
+                <button class="cta-button"><a href="{% url 'register' %}">Comenzar ahora</a></button>
             </div>
         </div>
     </section>

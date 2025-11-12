@@ -216,7 +216,6 @@ body {
 }
 
 .services-header {
-    text-align: center;
     margin-bottom: 4rem;
 }
 
@@ -350,12 +349,11 @@ body {
 
 .service-card h3 {
     font-size: 1.6rem;
-    color: #7c3aed;
     margin-bottom: 1rem;
 }
 
 .service-card p {
-    color: #666;
+    color: #7c3aed;
     line-height: 1.8;
     margin-bottom: 1.5rem;
 }
@@ -412,6 +410,11 @@ body {
 .cta-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.cta-button a {
+    text-decoration: none;
+    color: #7c3aed;
 }
 
 /* Target Audience Section */
