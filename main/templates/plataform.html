@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIDERESAS - Plataforma</title>
+    <link rel="stylesheet" href="{% static 'css/platform-styles.css' %}">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">🌸</div>
+            <h2>LIDERESAS</h2>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="dashboard">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-section="documents">
+                <span class="nav-icon">📁</span>
+                <span>Mis Documentos</span>
+            </a>
+            <a href="#" class="nav-item" data-section="upload">
+                <span class="nav-icon">⬆️</span>
+                <span>Subir Archivos</span>
+            </a>
+            <a href="#" class="nav-item" data-section="categories">
+                <span class="nav-icon">🏷️</span>
+                <span>Categorías</span>
+            </a>
+            <a href="#" class="nav-item" data-section="search">
+                <span class="nav-icon">🔍</span>
+                <span>Búsqueda</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                    <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                    <div class="user-role">Emprendedora</div>
+                </div>
+            </div>
+            <form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Cerrar sesión</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Bienvenida de nuevo, {{ user.first_name }}</p>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" placeholder="Buscar documentos..." id="searchInput">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <button class="notification-btn">
+                    🔔
+                    <span class="notification-badge">3</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section class="content-section active" id="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">📄</div>
+                    <div class="stat-info">
+                        <div class="stat-number">24</div>
+                        <div class="stat-label">Documentos totales</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">📁</div>
+                    <div class="stat-info">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Categorías</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899, #db2777);">⬆️</div>
+                    <div class="stat-info">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Subidos hoy</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">💾</div>
+                    <div class="stat-info">
+                        <div class="stat-number">2.4 GB</div>
+                        <div class="stat-label">Espacio usado</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-section">
+                <div class="section-header">
+                    <h2>Documentos Recientes</h2>
+                    <a href="#" class="view-all">Ver todos →</a>
+                </div>
+                <div class="documents-grid" id="recentDocuments">
+                    <!-- Documentos se cargarán aquí -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Documents Section -->
+        <section class="content-section" id="documents">
+            <div class="section-header">
+                <h2>Todos mis Documentos</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="facturas">Facturas</button>
+                    <button class="filter-btn" data-filter="contratos">Contratos</button>
+                    <button class="filter-btn" data-filter="otros">Otros</button>
+                </div>
+            </div>
+            <div class="documents-grid" id="allDocuments">
+                <!-- Documentos se cargarán aquí -->
+            </div>
+        </section>
+
+        <!-- Upload Section -->
+        <section class="content-section" id="upload">
+            <div class="upload-container">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📤</div>
+                    <h3>Arrastra tus archivos aquí</h3>
+                    <p>o haz clic para seleccionar</p>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx">
+                    <button class="select-files-btn" onclick="document.getElementById('fileInput').click()">
+                        Seleccionar archivos
+                    </button>
+                </div>
+                
+                <div class="upload-form">
+                    <h3>Detalles del documento</h3>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="categorySelect">
+                            <option value="facturas">Facturas</option>
+                            <option value="contratos">Contratos</option>
+                            <option value="reportes">Reportes</option>
+                            <option value="certificados">Certificados</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Etiquetas (opcional)</label>
+                        <input type="text" id="tagsInput" placeholder="ej: importante, urgente">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notas (opcional)</label>
+                        <textarea id="notesInput" rows="3" placeholder="Añade notas sobre este documento..."></textarea>
+                    </div>
+                    
+                    <button class="upload-btn" id="uploadBtn" disabled>
+                        <span>📤</span> Subir documento
+                    </button>
+                </div>
+            </div>
+            
+            <div class="upload-progress" id="uploadProgress" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-text" id="progressText">Subiendo... 0%</p>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="content-section" id="categories">
+            <div class="section-header">
+                <h2>Mis Categorías</h2>
+                <button class="add-category-btn">+ Nueva Categoría</button>
+            </div>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <div class="category-icon">📄</div>
+                    <h3>Facturas</h3>
+                    <p class="category-count">12 documentos</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">📋</div>
+                    <h3>Contratos</h3>
+                    <p class="category-count">5 documentos</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">📊</div>
+                    <h3>Reportes</h3>
+                    <p class="category-count">8 documentos</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">🎓</div>
+                    <h3>Certificados</h3>
+                    <p class="category-count">3 documentos</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section class="content-section" id="search">
+            <div class="search-container">
+                <div class="search-box-large">
+                    <input type="text" placeholder="Buscar por nombre, categoría o etiqueta..." id="mainSearchInput">
+                    <button class="search-btn-large">🔍 Buscar</button>
+                </div>
+                <div class="search-filters">
+                    <select class="filter-select">
+                        <option>Todas las categorías</option>
+                        <option>Facturas</option>
+                        <option>Contratos</option>
+                        <option>Reportes</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>Fecha: Más recientes</option>
+                        <option>Fecha: Más antiguos</option>
+                        <option>Nombre: A-Z</option>
+                        <option>Nombre: Z-A</option>
+                    </select>
+                </div>
+                <div class="search-results" id="searchResults">
+                    <p class="no-results">Ingresa un término de búsqueda para ver resultados</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="{% static 'js/platform-script.js' %}"></script>
+</body>
+</html>
