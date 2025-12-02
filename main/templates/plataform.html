@@ -48,7 +48,7 @@
                     <div class="user-role">Emprendedora</div>
                 </div>
             </div>
-            <form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+            <form method="POST" action="{% url 'index' %}" style="margin: 0;">
                 {% csrf_token %}
                 <button type="submit" class="logout-btn">Cerrar sesión</button>
             </form>

@@ -8,6 +8,19 @@
   <link rel="stylesheet" href="{% static 'css/forms.css' %}">
 </head>
 <body>
+  <nav class="navbar">
+    <a href="{% url 'index' %}">
+        <div class="logo">
+            <img src="{% static 'img/logo.png' %}" alt="Descripción de la imagen" width="50" height="50">
+            </div>
+    </a>
+
+    <div class="nav-links">
+        <a href="{% url 'login' %}">Iniciar sesión</a>
+        <a href="{% url 'register' %}">Regístrate</a>
+
+    </div>
+</nav>
   <div class="container">
     <div class="form-box">
       <h1>Regístrate</h1>

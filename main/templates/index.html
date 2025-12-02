@@ -9,9 +9,11 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">
-        <img src="{% static 'img/logo.png' %}" alt="Descripción de la imagen" width="50" height="50">
-        </div>
+        <a href="{% url 'index' %}">
+            <div class="logo">
+                <img src="{% static 'img/logo.png' %}" alt="Descripción de la imagen" width="50" height="50">
+                </div>
+        </a>
 
         <div class="nav-links">
             <a href="{% url 'login' %}">Iniciar sesión</a>
@@ -86,7 +88,7 @@
             <div class="cta-section">
                 <h3>¿Lista para transformar tu negocio?</h3>
                 <p>Únete a cientos de emprendedoras que ya confían en nosotras</p>
-                <button class="cta-button"><a href="{% url 'register' %}">Comenzar ahora</a></button>
+                <button class="cta-button" ><a href="{% url 'register' %}">Comenzar ahora</a></button>
             </div>
         </div>
     </section>
@@ -94,28 +96,16 @@
     <section class="target-audience">
         <div class="container">
             <div class="audience-content">
-                <div class="audience-left">
+                
+                <div class="audience-text">
+                    <h2>¿A quién va dirigido?</h2>
+                    <p class="audience-intro">Creado especialmente para mujeres emprendedoras que buscan profesionalizar su negocio</p>
                     <div class="audience-icon">
                         <div class="person person-1"></div>
                         <div class="person person-2"></div>
                         <div class="person person-3"></div>
                     </div>
-                    <div class="audience-stats">
-                        <div class="stat">
-                            <div class="stat-number">500+</div>
-                            <div class="stat-label">Emprendedoras</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">1000+</div>
-                            <div class="stat-label">Documentos seguros</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="audience-text">
-                    <h2>¿A quién va dirigido?</h2>
-                    <p class="audience-intro">Creado especialmente para mujeres emprendedoras que buscan profesionalizar su negocio</p>
-                    
+                    <br>
                     <div class="audience-list">
                         <div class="audience-item">
                             <span class="audience-emoji">👩‍💼</span>
@@ -148,7 +138,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 LIDERESAS. Todos los derechos reservados.</p>
+            <p>&copy; 2025 LIDERESAS. Todos los derechos reservados.</p>
         </div>
     </footer>
 </body>
