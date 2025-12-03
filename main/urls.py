@@ -18,6 +18,8 @@ urlpatterns = [
     path('api/documents/upload/', views.upload_document, name='upload_document'),
     path('api/documents/', views.get_documents, name='get_documents'),
     path('api/documents/recent/', views.get_recent_documents, name='get_recent_documents'),
+    path('api/documents/<int:document_id>/download/', views.download_document, name='download_document'),
+    path('api/documents/<int:document_id>/delete/', views.delete_document, name='delete_document'),
 ]
 
 

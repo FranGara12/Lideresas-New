@@ -166,35 +166,54 @@ async function updateDashboardStats() {
 
 async function downloadDocument(id) {
     try {
-        const doc = documents.find(d => d.id === id);
-        if (doc) {
-            alert(`📥 Descargando: ${doc.name}`);
-            // window.open(`/api/documents/${id}/download/`, '_blank');
-        }
+        console.log(`📥 Intentando descargar documento ID: ${id}`);
+        
+        // Método más simple y directo
+        const downloadUrl = `/api/documents/${id}/download/`;
+        
+        // Abrir en nueva pestaña
+        window.open(downloadUrl, '_blank');
+        
+        console.log(`✅ Solicitud de descarga enviada para documento ID: ${id}`);
+        
     } catch (error) {
         console.error('Error descargando documento:', error);
-        alert('Error al descargar el documento');
+        alert('Error al descargar el documento. Intenta nuevamente.');
     }
 }
 
 async function deleteDocument(id) {
-    if (confirm('¿Estás segura de eliminar este documento?')) {
+    if (confirm('¿Estás segura de eliminar este documento? Esta acción no se puede deshacer.')) {
         try {
-            // Implementar la llamada al backend para eliminar
-            // const response = await fetch(`/api/documents/${id}/delete/`, {
-            //     method: 'DELETE',
-            //     headers: {
-            //         'X-CSRFToken': getCookie('csrftoken')
-            //     }
-            // });
+            console.log(`🗑️ Intentando eliminar documento ID: ${id}`);
             
-            documents = documents.filter(d => d.id !== id);
-            loadAllDocuments();
-            loadRecentDocuments();
-            alert('🗑️ Documento eliminado');
+            const response = await fetch(`/api/documents/${id}/delete/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Recargar la página para ver los cambios
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+                
+                alert('✅ Documento eliminado exitosamente');
+            } else {
+                throw new Error(data.error || 'Error al eliminar');
+            }
+            
         } catch (error) {
             console.error('Error eliminando documento:', error);
-            alert('Error al eliminar el documento');
+            alert(`❌ Error: ${error.message}`);
         }
     }
 }

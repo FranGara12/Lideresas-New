@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, Http404
 from django.db.models import Sum, Count
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -367,3 +367,49 @@ def get_recent_documents(request):
         return JsonResponse({'success': True, 'documents': docs_data})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+ 
+@login_required(login_url='login')
+def download_document(request, document_id):
+    """Descargar un documento"""
+    try:
+        # Obtener el documento del usuario actual
+        document = Document.objects.get(id=document_id, user=request.user)
+        
+        # Verificar que el archivo existe
+        if document.file:
+            # Crear la respuesta para descargar el archivo
+            response = FileResponse(document.file.open('rb'), as_attachment=True)
+            response['Content-Disposition'] = f'attachment; filename="{document.name}"'
+            return response
+        else:
+            raise Http404("El archivo no existe")
+            
+    except Document.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Documento no encontrado'}, status=404)
+    except Exception as e:
+        print(f"❌ Error al descargar documento: {e}")
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+@login_required(login_url='login')
+def delete_document(request, document_id):
+    """Eliminar un documento"""
+    if request.method == 'DELETE':
+        try:
+            document = Document.objects.get(id=document_id, user=request.user)
+            
+            # Eliminar el archivo físico del sistema de archivos
+            if document.file:
+                if os.path.isfile(document.file.path):
+                    os.remove(document.file.path)
+            
+            # Eliminar el registro de la base de datos
+            document.delete()
+            
+            return JsonResponse({'success': True, 'message': 'Documento eliminado'})
+        except Document.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Documento no encontrado'}, status=404)
+        except Exception as e:
+            print(f"❌ Error al eliminar documento: {e}")
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
