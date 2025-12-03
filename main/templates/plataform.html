@@ -81,7 +81,7 @@
                 <div class="stat-card">
                     <div class="stat-icon" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">📄</div>
                     <div class="stat-info">
-                        <div class="stat-number">3</div>
+                        <div class="stat-number">{{ total_documents }}</div>
                         <div class="stat-label">Documentos totales</div>
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                 <div class="stat-card">
                     <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">📁</div>
                     <div class="stat-info">
-                        <div class="stat-number">4</div>
+                        <div class="stat-number">{{ total_categories }}</div>
                         <div class="stat-label">Categorías</div>
                     </div>
                 </div>
@@ -97,7 +97,7 @@
                 <div class="stat-card">
                     <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899, #db2777);">⬆️</div>
                     <div class="stat-info">
-                        <div class="stat-number">0</div>
+                        <div class="stat-number">{{ documents_today }}</div>
                         <div class="stat-label">Subidos hoy</div>
                     </div>
                 </div>
@@ -105,7 +105,7 @@
                 <div class="stat-card">
                     <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">💾</div>
                     <div class="stat-info">
-                        <div class="stat-number">745 KB</div>
+                        <div class="stat-number">{{ size_display }}</div>
                         <div class="stat-label">Espacio usado</div>
                     </div>
                 </div>
@@ -121,6 +121,7 @@
                 </div>
             </div>
         </section>
+
 
         <!-- Documents Section -->
         <section class="content-section" id="documents">
@@ -192,31 +193,57 @@
         <section class="content-section" id="categories">
             <div class="section-header">
                 <h2>Mis Categorías</h2>
-                <button class="add-category-btn">+ Nueva Categoría</button>
+                <button class="add-category-btn" id="openModalBtn">+ Nueva Categoría</button>
             </div>
-            <div class="categories-grid">
-                <div class="category-card">
-                    <div class="category-icon">📄</div>
-                    <h3>Facturas</h3>
-                    <p class="category-count">12 documentos</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon">📋</div>
-                    <h3>Contratos</h3>
-                    <p class="category-count">5 documentos</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon">📊</div>
-                    <h3>Reportes</h3>
-                    <p class="category-count">8 documentos</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon">🎓</div>
-                    <h3>Certificados</h3>
-                    <p class="category-count">3 documentos</p>
-                </div>
+            <div class="categories-grid" id="categoriesGrid">
+                {% if categories %}
+                    {% for category in categories %}
+                    <div class="category-card" data-category-id="{{ category.id }}">
+                        <div class="category-icon">{{ category.icon }}</div>
+                        <h3>{{ category.name }}</h3>
+                        <p class="category-count">{{ category.document_count }} documentos</p>
+                        <button class="delete-category-btn" data-id="{{ category.id }}" title="Eliminar categoría">❌</button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-categories">
+                        <p>No tienes categorías aún. ¡Crea tu primera categoría!</p>
+                    </div>
+                {% endif %}
             </div>
         </section>
+
+        <!-- Modal para crear categoría -->
+        <div id="categoryModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeModalBtn">&times;</span>
+                <h2>Nueva Categoría</h2>
+                <form id="categoryForm">
+                    <div class="form-group">
+                        <label>Nombre de la categoría</label>
+                        <input type="text" id="categoryName" placeholder="Ej: Facturas, Contratos..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Icono (emoji)</label>
+                        <input type="text" id="categoryIcon" placeholder="📁" maxlength="2" value="📁">
+                        <small>Elige un emoji: 📄 📁 📋 📊 🎓 💼 📝 📌 🏷️ 📦</small>
+                    </div>
+                    <button type="submit" class="submit-btn">Crear Categoría</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de confirmación para eliminar -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <h2>¿Estás segura?</h2>
+                <p>¿Realmente deseas eliminar esta categoría? Esta acción no se puede deshacer.</p>
+                <div class="modal-buttons">
+                    <button class="cancel-btn" id="cancelDeleteBtn">Cancelar</button>
+                    <button class="confirm-btn" id="confirmDeleteBtn">Sí, eliminar</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Search Section -->
         <section class="content-section" id="search">
