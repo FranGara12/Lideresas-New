@@ -1,0 +1,12 @@
+{
+  "builds": [{
+    "src": "lideresas/wsgi.py",
+    "use": "vercel-python"
+  }],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "lideresas/wsgi.py"
+    }
+  ]
+}
