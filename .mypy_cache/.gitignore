@@ -1,0 +1,9 @@
+# Automatically created by mypy
+.env
+db.sqlite3
+__pycache__/
+*.pyc
+*.pyo
+.mypy_cache/
+staticfiles_build/
+
