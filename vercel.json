@@ -3,18 +3,13 @@
   "builds": [
     {
       "src": "lideresas/wsgi.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     }
   ],
   "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/media/(.*)",
-      "dest": "/media/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "lideresas/wsgi.py"
