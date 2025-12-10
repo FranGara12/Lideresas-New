@@ -7,7 +7,13 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from .models import CustomUser, Category, Document
 from django.views.decorators.csrf import csrf_exempt
+import cloudinary
+import cloudinary.uploader
+import cloudinary.utils
 import json
+import time
+import os
+import re
 
 def index(request):
     return render(request, 'index.html')
@@ -197,6 +203,7 @@ def get_user_categories(request):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
+
 @login_required(login_url='login')
 @csrf_exempt
 def upload_document(request):
@@ -266,27 +273,50 @@ def upload_document(request):
             for file in files:
                 print(f"📤 Procesando archivo: {file.name} ({file.size} bytes)")
                 
-                # Validar tamaño
-                if file.size > 10 * 1024 * 1024:
+                # Validar tamaño - aumentado a 100MB
+                if file.size > 100 * 1024 * 1024:
                     print(f"❌ Archivo demasiado grande: {file.name}")
                     return JsonResponse({
                         'success': False, 
-                        'error': f'El archivo {file.name} es demasiado grande (máximo 10MB)'
+                        'error': f'El archivo {file.name} es demasiado grande (máximo 100MB)'
                     }, status=400)
+                
+                # Obtener nombre base sin extensión
+                file_name_without_ext = os.path.splitext(file.name)[0]
+                # Crear un nombre seguro para Cloudinary
+                safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', file_name_without_ext)
+                
+                # Subir a Cloudinary como RAW explícitamente
+                upload_result = cloudinary.uploader.upload(
+                    file,
+                    folder="documents/",
+                    resource_type="raw",
+                    public_id=f"documents/{request.user.id}_{int(time.time())}_{safe_name}",
+                    overwrite=True,
+                    use_filename=False,  # No usar el nombre del archivo automáticamente
+                    unique_filename=True,
+                    invalidate=True
+                )
+                
+                print(f"✅ Resultado completo de Cloudinary: {upload_result}")
+                print(f"✅ Public ID: {upload_result.get('public_id')}")
+                print(f"✅ URL segura: {upload_result.get('secure_url')}")
+                print(f"✅ Versión: {upload_result.get('version')}")
+                print(f"✅ Resource type: {upload_result.get('resource_type')}")
                 
                 # Crear documento
                 doc = Document.objects.create(
                     user=request.user,
                     category=category,
                     name=file.name,
-                    file=file,
+                    file=upload_result['public_id'],
                     size=file.size,
                     notes=notes,
                     tags=tags
                 )
                 
                 print(f"✅ Documento creado en BD: {doc.id} - {doc.name}")
-                print(f"✅ Ruta del archivo: {doc.file.path}")
+                print(f"✅ File field value: {doc.file}")
                 
                 uploaded_docs.append({
                     'id': doc.id,
@@ -295,7 +325,7 @@ def upload_document(request):
                     'icon': doc.get_icon(),
                     'date': doc.uploaded_at.strftime('%Y-%m-%d'),
                     'category': category.name if category else 'Sin categoría',
-                    'category_slug': category.name.lower() if category else 'otros'
+                    'category_slug': category.name.lower().replace(' ', '-') if category else 'otros'
                 })
             
             print(f"✅ Subida completada exitosamente. Total: {len(uploaded_docs)} documentos")
@@ -315,10 +345,6 @@ def upload_document(request):
     print("❌ Método no permitido")
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
-# ============================================
-# FUNCIONES FALTANTES - AGREGAR ESTAS
-# ============================================
-
 @login_required(login_url='login')
 def get_documents(request):
     """Obtener todos los documentos del usuario"""
@@ -327,6 +353,17 @@ def get_documents(request):
         
         docs_data = []
         for doc in documents:
+            # Obtener la URL del archivo
+            file_url = None
+            try:
+                # Generar URL de Cloudinary
+                file_url = cloudinary.utils.cloudinary_url(
+                    str(doc.file),
+                    resource_type="raw"
+                )[0]
+            except:
+                file_url = "#"
+            
             docs_data.append({
                 'id': doc.id,
                 'name': doc.name,
@@ -334,7 +371,8 @@ def get_documents(request):
                 'date': doc.uploaded_at.strftime('%Y-%m-%d'),
                 'icon': doc.get_icon(),
                 'category': doc.category.name if doc.category else 'Sin categoría',
-                'category_slug': doc.category.name.lower() if doc.category else 'otros'
+                'category_slug': doc.category.name.lower().replace(' ', '-') if doc.category else 'otros',
+                'url': file_url
             })
         
         return JsonResponse({'success': True, 'documents': docs_data})
@@ -353,6 +391,16 @@ def get_recent_documents(request):
         
         docs_data = []
         for doc in documents:
+            # Obtener la URL del archivo
+            file_url = None
+            try:
+                file_url = cloudinary.utils.cloudinary_url(
+                    str(doc.file),
+                    resource_type="raw"
+                )[0]
+            except:
+                file_url = "#"
+            
             docs_data.append({
                 'id': doc.id,
                 'name': doc.name,
@@ -360,31 +408,84 @@ def get_recent_documents(request):
                 'date': doc.uploaded_at.strftime('%Y-%m-%d'),
                 'icon': doc.get_icon(),
                 'category': doc.category.name if doc.category else 'Sin categoría',
-                'category_slug': doc.category.name.lower() if doc.category else 'otros'
+                'category_slug': doc.category.name.lower().replace(' ', '-') if doc.category else 'otros',
+                'url': file_url
             })
         
         return JsonResponse({'success': True, 'documents': docs_data})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
- 
+
 @login_required(login_url='login')
 def download_document(request, document_id):
-    """Descargar un documento"""
+    """Descargar un documento - VERSIÓN CORREGIDA"""
     try:
         document = Document.objects.get(id=document_id, user=request.user)
         
-        if document.file:
-            # Con Cloudinary, redirigir a la URL del archivo
-            return redirect(document.file.url)
-        else:
-            raise Http404("El archivo no existe")
+        print(f"📥 Descargando documento: {document.name}")
+        print(f"📥 File field value: {document.file}")
+        print(f"📥 File field type: {type(document.file)}")
+        
+        # Obtener el public_id correctamente
+        public_id = str(document.file)
+        print(f"📥 Public ID (raw): {public_id}")
+        
+        # Verificar si el public_id ya incluye "documents/"
+        if not public_id.startswith('documents/'):
+            public_id = f"documents/{public_id}"
+        
+        print(f"📥 Public ID (procesado): {public_id}")
+        
+        # FORMA 1: Usar cloudinary.utils.cloudinary_url correctamente
+        try:
+            download_url, options = cloudinary.utils.cloudinary_url(
+                public_id,
+                resource_type="raw",
+                type="upload",
+                flags="attachment",
+                attachment=document.name
+            )
+            print(f"🔗 URL de descarga generada (método 1): {download_url}")
             
+            # Verificar que la URL sea válida
+            if 'res.cloudinary.com' in download_url:
+                return redirect(download_url)
+        except Exception as e1:
+            print(f"⚠️  Error método 1: {e1}")
+        
+        # FORMA 2: Construir URL manualmente (más confiable)
+        try:
+            cloud_name = cloudinary.config().cloud_name or 'def1jabap'
+            # Asegurarse de que el public_id no tenga el prefijo "v1/"
+            clean_public_id = re.sub(r'^v\d+/', '', public_id)
+            # Construir URL manualmente
+            download_url = f"https://res.cloudinary.com/{cloud_name}/raw/upload/fl_attachment/{clean_public_id}"
+            print(f"🔗 URL de descarga generada (método 2): {download_url}")
+            return redirect(download_url)
+        except Exception as e2:
+            print(f"⚠️  Error método 2: {e2}")
+        
+        # FORMA 3: Usar la URL básica sin flags de attachment
+        try:
+            cloud_name = cloudinary.config().cloud_name or 'def1jabap'
+            clean_public_id = re.sub(r'^v\d+/', '', public_id)
+            download_url = f"https://res.cloudinary.com/{cloud_name}/raw/upload/{clean_public_id}"
+            print(f"🔗 URL de descarga generada (método 3): {download_url}")
+            return redirect(download_url)
+        except Exception as e3:
+            print(f"⚠️  Error método 3: {e3}")
+            raise e3
+        
     except Document.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Documento no encontrado'}, status=404)
     except Exception as e:
         print(f"❌ Error al descargar documento: {e}")
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
+
+ 
 @login_required(login_url='login')
 def delete_document(request, document_id):
     """Eliminar un documento"""
@@ -392,8 +493,14 @@ def delete_document(request, document_id):
         try:
             document = Document.objects.get(id=document_id, user=request.user)
             
-            # Cloudinary eliminará automáticamente el archivo
-            # Ya no necesitamos os.remove()
+            # Eliminar de Cloudinary primero
+            try:
+                cloudinary.uploader.destroy(str(document.file), resource_type="raw")
+                print(f"🗑️  Archivo eliminado de Cloudinary: {document.file}")
+            except Exception as e:
+                print(f"⚠️  No se pudo eliminar de Cloudinary (puede que ya no exista): {e}")
+            
+            # Eliminar de la base de datos
             document.delete()
             
             return JsonResponse({'success': True, 'message': 'Documento eliminado'})
@@ -404,3 +511,65 @@ def delete_document(request, document_id):
             return JsonResponse({'success': False, 'error': str(e)}, status=400)
     
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+
+@login_required(login_url='login')
+def test_document_url(request, document_id):
+    """Función de diagnóstico para probar URLs de documentos"""
+    try:
+        document = Document.objects.get(id=document_id, user=request.user)
+        
+        public_id = str(document.file)
+        
+        # Diferentes formas de generar URLs
+        urls = []
+        
+        # Método 1: cloudinary.utils.cloudinary_url básico
+        try:
+            url1, _ = cloudinary.utils.cloudinary_url(
+                public_id,
+                resource_type="raw"
+            )
+            urls.append(("Método 1 (básico)", url1))
+        except Exception as e:
+            urls.append(("Método 1 (básico)", f"Error: {e}"))
+        
+        # Método 2: Con attachment
+        try:
+            url2, _ = cloudinary.utils.cloudinary_url(
+                public_id,
+                resource_type="raw",
+                flags="attachment",
+                attachment=document.name
+            )
+            urls.append(("Método 2 (con attachment)", url2))
+        except Exception as e:
+            urls.append(("Método 2 (con attachment)", f"Error: {e}"))
+        
+        # Método 3: Manual sin versión
+        clean_public_id = re.sub(r'^v\d+/', '', public_id)
+        url3 = f"https://res.cloudinary.com/def1jabap/raw/upload/{clean_public_id}"
+        urls.append(("Método 3 (manual sin versión)", url3))
+        
+        # Método 4: Manual con attachment
+        url4 = f"https://res.cloudinary.com/def1jabap/raw/upload/fl_attachment/{clean_public_id}"
+        urls.append(("Método 4 (manual con attachment)", url4))
+        
+        # Método 5: Si tiene versión explícita
+        version_match = re.search(r'^v(\d+)/', public_id)
+        if version_match:
+            version = version_match.group(1)
+            clean_id = re.sub(r'^v\d+/', '', public_id)
+            url5 = f"https://res.cloudinary.com/def1jabap/raw/upload/v{version}/{clean_id}"
+            urls.append((f"Método 5 (con versión {version})", url5))
+        
+        context = {
+            'document': document,
+            'public_id': public_id,
+            'clean_public_id': clean_public_id,
+            'urls': urls,
+        }
+        
+        return render(request, 'test_urls.html', context)
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

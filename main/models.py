@@ -55,19 +55,16 @@ class Category(models.Model):
         return self.documents.count()
 
 
-
-
 class Document(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='documents')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')
     name = models.CharField(max_length=255)
-    file = CloudinaryField('document', folder='documents')  # ← CAMBIO AQUÍ
+    # CAMBIA AQUÍ - resource_type='raw' para todos los documentos
+    file = CloudinaryField(resource_type='raw', folder='documents')
     size = models.BigIntegerField(null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True)
     tags = models.CharField(max_length=255, blank=True)
-    
-    
     
     class Meta:
         db_table = 'documents'
@@ -78,6 +75,9 @@ class Document(models.Model):
     
     def get_size_display(self):
         """Retorna el tamaño en formato legible"""
+        if not self.size:
+            return "Desconocido"
+        
         if self.size < 1024:
             return f"{self.size} B"
         elif self.size < 1024 * 1024:
@@ -93,9 +93,27 @@ class Document(models.Model):
         icons = {
             'pdf': '📄',
             'doc': '📋', 'docx': '📋',
-            'xls': '📊', 'xlsx': '📊',
-            'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️',
-            'zip': '📦', 'rar': '📦',
+            'xls': '📊', 'xlsx': '📊', 'xlsm': '📊', 'xlsb': '📊',
+            'ppt': '📽️', 'pptx': '📽️',
+            'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️', 'bmp': '🖼️', 'svg': '🖼️',
+            'zip': '📦', 'rar': '📦', '7z': '📦', 'tar': '📦', 'gz': '📦',
             'txt': '📝',
+            'csv': '📋',
+            'xml': '📄',
+            'json': '📄',
+            'mp3': '🎵', 'wav': '🎵',
+            'mp4': '🎬', 'avi': '🎬', 'mov': '🎬',
+            'exe': '⚙️',
+            'dmg': '💿',
+            'psd': '🎨',
+            'ai': '🎨',
+            'indd': '📰',
+            'tif': '🖼️', 'tiff': '🖼️',
+            'html': '🌐', 'htm': '🌐',
+            'css': '🎨',
+            'js': '📜',
+            'py': '🐍',
+            'java': '☕',
+            'c': '🔧', 'cpp': '🔧',
         }
         return icons.get(ext, '📎')
