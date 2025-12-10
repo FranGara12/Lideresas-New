@@ -418,63 +418,60 @@ def get_recent_documents(request):
 
 @login_required(login_url='login')
 def download_document(request, document_id):
-    """Descargar un documento - VERSIÓN CORREGIDA"""
+    """Descargar un documento - VERSIÓN SIMPLIFICADA Y FUNCIONAL"""
     try:
         document = Document.objects.get(id=document_id, user=request.user)
         
         print(f"📥 Descargando documento: {document.name}")
-        print(f"📥 File field value: {document.file}")
-        print(f"📥 File field type: {type(document.file)}")
+        
+        # OPCIÓN 1: Usar la URL directa del campo Cloudinary y modificarla
+        if hasattr(document.file, 'url'):
+            file_url = document.file.url
+            
+            # Verificar si ya es una URL de Cloudinary
+            if 'res.cloudinary.com' in file_url:
+                # Insertar fl_attachment después de /upload/ para forzar descarga
+                if '/upload/' in file_url:
+                    # Reemplazar solo la primera ocurrencia
+                    parts = file_url.split('/upload/', 1)
+                    download_url = parts[0] + '/upload/fl_attachment/' + parts[1]
+                    
+                    # Asegurarse de que no haya duplicación de 'documents/'
+                    download_url = download_url.replace('/documents/documents/', '/documents/')
+                    
+                    print(f"🔗 URL generada: {download_url}")
+                    return redirect(download_url)
+        
+        # OPCIÓN 2: Si no funciona la opción 1, construir URL manualmente
+        cloud_name = 'def1jabap'  # Tu cloud name
         
         # Obtener el public_id correctamente
-        public_id = str(document.file)
-        print(f"📥 Public ID (raw): {public_id}")
+        if hasattr(document.file, 'public_id'):
+            public_id = document.file.public_id
+        else:
+            public_id = str(document.file)
         
-        # Verificar si el public_id ya incluye "documents/"
-        if not public_id.startswith('documents/'):
-            public_id = f"documents/{public_id}"
+        print(f"📥 Public ID: {public_id}")
         
-        print(f"📥 Public ID (procesado): {public_id}")
+        # Limpiar el public_id - quitar prefijos innecesarios
+        if public_id.startswith('v1/'):
+            public_id = public_id[3:]  # Remover "v1/"
         
-        # FORMA 1: Usar cloudinary.utils.cloudinary_url correctamente
-        try:
-            download_url, options = cloudinary.utils.cloudinary_url(
-                public_id,
-                resource_type="raw",
-                type="upload",
-                flags="attachment",
-                attachment=document.name
-            )
-            print(f"🔗 URL de descarga generada (método 1): {download_url}")
-            
-            # Verificar que la URL sea válida
-            if 'res.cloudinary.com' in download_url:
-                return redirect(download_url)
-        except Exception as e1:
-            print(f"⚠️  Error método 1: {e1}")
+        # Asegurarse de que solo tenga un prefijo "documents/"
+        if public_id.startswith('documents/'):
+            # Ya tiene el prefijo correcto
+            clean_public_id = public_id
+        else:
+            # Agregar el prefijo
+            clean_public_id = f"documents/{public_id}"
         
-        # FORMA 2: Construir URL manualmente (más confiable)
-        try:
-            cloud_name = cloudinary.config().cloud_name or 'def1jabap'
-            # Asegurarse de que el public_id no tenga el prefijo "v1/"
-            clean_public_id = re.sub(r'^v\d+/', '', public_id)
-            # Construir URL manualmente
-            download_url = f"https://res.cloudinary.com/{cloud_name}/raw/upload/fl_attachment/{clean_public_id}"
-            print(f"🔗 URL de descarga generada (método 2): {download_url}")
-            return redirect(download_url)
-        except Exception as e2:
-            print(f"⚠️  Error método 2: {e2}")
+        print(f"📥 Clean Public ID: {clean_public_id}")
         
-        # FORMA 3: Usar la URL básica sin flags de attachment
-        try:
-            cloud_name = cloudinary.config().cloud_name or 'def1jabap'
-            clean_public_id = re.sub(r'^v\d+/', '', public_id)
-            download_url = f"https://res.cloudinary.com/{cloud_name}/raw/upload/{clean_public_id}"
-            print(f"🔗 URL de descarga generada (método 3): {download_url}")
-            return redirect(download_url)
-        except Exception as e3:
-            print(f"⚠️  Error método 3: {e3}")
-            raise e3
+        # Construir URL directa para descarga
+        download_url = f"https://res.cloudinary.com/{cloud_name}/raw/upload/fl_attachment/{clean_public_id}"
+        
+        print(f"🔗 URL final: {download_url}")
+        return redirect(download_url)
         
     except Document.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Documento no encontrado'}, status=404)
@@ -484,8 +481,6 @@ def download_document(request, document_id):
         traceback.print_exc()
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
-
- 
 @login_required(login_url='login')
 def delete_document(request, document_id):
     """Eliminar un documento"""

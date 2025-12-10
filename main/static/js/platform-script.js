@@ -124,8 +124,11 @@ async function loadAllDocuments() {
                         <div class="document-category">${doc.category}</div>
                         <div class="document-actions">
                             <button class="doc-action-btn doc-download" onclick="downloadDocument(${doc.id})">
-                                ⬇️ Descargar
+                                <a href="{% url 'download_document' document.id %}" target="_blank" class="download-btn">
+                                📥 Descargar
+                                </a>
                             </button>
+                            
                             <button class="doc-action-btn doc-delete" onclick="deleteDocument(${doc.id})">
                                 🗑️ Eliminar
                             </button>
