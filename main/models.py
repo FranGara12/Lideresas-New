@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-
+from cloudinary.models import CloudinaryField
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -55,15 +55,19 @@ class Category(models.Model):
         return self.documents.count()
 
 
+
+
 class Document(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='documents')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')
     name = models.CharField(max_length=255)
-    file = models.FileField(upload_to='documents/%Y/%m/%d/')
+    file = CloudinaryField('document', folder='documents')  # ← CAMBIO AQUÍ
     size = models.BigIntegerField(null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True)
     tags = models.CharField(max_length=255, blank=True)
+    
+    
     
     class Meta:
         db_table = 'documents'

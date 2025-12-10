@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from .models import CustomUser, Category, Document
 from django.views.decorators.csrf import csrf_exempt
 import json
-import os
 
 def index(request):
     return render(request, 'index.html')
@@ -372,15 +371,11 @@ def get_recent_documents(request):
 def download_document(request, document_id):
     """Descargar un documento"""
     try:
-        # Obtener el documento del usuario actual
         document = Document.objects.get(id=document_id, user=request.user)
         
-        # Verificar que el archivo existe
         if document.file:
-            # Crear la respuesta para descargar el archivo
-            response = FileResponse(document.file.open('rb'), as_attachment=True)
-            response['Content-Disposition'] = f'attachment; filename="{document.name}"'
-            return response
+            # Con Cloudinary, redirigir a la URL del archivo
+            return redirect(document.file.url)
         else:
             raise Http404("El archivo no existe")
             
@@ -397,12 +392,8 @@ def delete_document(request, document_id):
         try:
             document = Document.objects.get(id=document_id, user=request.user)
             
-            # Eliminar el archivo físico del sistema de archivos
-            if document.file:
-                if os.path.isfile(document.file.path):
-                    os.remove(document.file.path)
-            
-            # Eliminar el registro de la base de datos
+            # Cloudinary eliminará automáticamente el archivo
+            # Ya no necesitamos os.remove()
             document.delete()
             
             return JsonResponse({'success': True, 'message': 'Documento eliminado'})
