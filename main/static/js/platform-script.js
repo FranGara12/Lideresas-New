@@ -124,9 +124,7 @@ async function loadAllDocuments() {
                         <div class="document-category">${doc.category}</div>
                         <div class="document-actions">
                             <button class="doc-action-btn doc-download" onclick="downloadDocument(${doc.id})">
-                                <a href="{% url 'download_document' document.id %}" target="_blank" class="download-btn">
                                 📥 Descargar
-                                </a>
                             </button>
                             
                             <button class="doc-action-btn doc-delete" onclick="deleteDocument(${doc.id})">
@@ -171,13 +169,21 @@ async function downloadDocument(id) {
     try {
         console.log(`📥 Intentando descargar documento ID: ${id}`);
         
-        // Método más simple y directo
+        // Método 1: Usar la ruta directa de Django
         const downloadUrl = `/api/documents/${id}/download/`;
         
-        // Abrir en nueva pestaña
-        window.open(downloadUrl, '_blank');
+        // Crear un iframe invisible para la descarga
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = downloadUrl;
+        document.body.appendChild(iframe);
         
-        console.log(`✅ Solicitud de descarga enviada para documento ID: ${id}`);
+        console.log(`✅ Descarga iniciada para documento ID: ${id}`);
+        
+        // Remover el iframe después de un tiempo
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 5000);
         
     } catch (error) {
         console.error('Error descargando documento:', error);
